@@ -34,7 +34,7 @@ jobs:
     - name: Run tests
       run: npm test
       env:
-        MONGODB_URI: mongodb://localhost:27017/test-db
+        MONGODB_URI: ${{ secrets.PROD_MONGODB_URI }}
     
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
@@ -80,18 +80,18 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
+        username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           # Pull the latest Docker image
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/product-catalog-service:latest
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/product-catalog-service:latest
           
           # Stop the existing container if it's running
-          docker stop product-catalog-service || true
-          docker rm product-catalog-service || true
+          sudo docker stop product-catalog-service || true
+          sudo docker rm product-catalog-service || true
           
           # Run the new container
-          docker run -d \
+          sudo docker run -d \
             --name product-catalog-service \
             -p 3000:3000 \
             -e MONGODB_URI=${{ secrets.PROD_MONGODB_URI }} \
@@ -99,4 +99,4 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/product-catalog-service:latest
           
           # Clean up unused images
-          docker system prune -f
+          sudo docker system prune -f
