@@ -94,8 +94,8 @@ jobs:
             sudo docker run -d \
               --name product-catalog-service \
               -p 3000:3000 \
-              -e MONGODB_URI=${{ secrets.PROD_MONGODB_URI }} \
-              -e NODE_ENV=production \
+              -e MONGODB_URI="${{ secrets.PROD_MONGODB_URI }}" \
+              -e NODE_ENV="production" \
               ${{ secrets.DOCKERHUB_USERNAME }}/product-catalog-service:latest
 
             # Clean up unused images
